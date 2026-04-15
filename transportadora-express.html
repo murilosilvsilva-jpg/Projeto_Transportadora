@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transportadora Express — Math & Logistix</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f8fafc;--card:#ffffff;--text:#0f172a;--muted:#64748b;--primary:#2563eb;
+    --primary-light:#dbeafe;--border:#e2e8f0;--success:#16a34a;--success-bg:#dcfce7;
+    --warning:#d97706;--warning-bg:#fef3c7;--danger:#dc2626;--danger-bg:#fee2e2;
+    --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+    --shadow-hover:0 4px 12px rgba(0,0,0,.1);
+    --radius:12px;
+  }
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+
+  /* Header */
+  header{background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;padding:14px 0}
+  .container{max-width:1100px;margin:0 auto;padding:0 20px}
+  .header-inner{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-icon{width:36px;height:36px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+  .logo h1{font-size:1.15rem;font-weight:700;line-height:1.2}
+  .logo small{font-size:.7rem;color:var(--muted)}
+  .status{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);background:#f1f5f9;padding:5px 12px;border-radius:20px}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* Hero */
+  .hero{text-align:center;padding:48px 20px 24px}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:600;color:var(--primary);background:var(--primary-light);padding:5px 14px;border-radius:20px;margin-bottom:12px}
+  .hero h2{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;line-height:1.15}
+  .hero h2 span{color:var(--primary)}
+  .hero p{margin-top:10px;color:var(--muted);max-width:640px;margin-left:auto;margin-right:auto;font-size:.95rem}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:32px}
+  .stat{display:flex;align-items:center;gap:12px;background:var(--card);padding:14px 16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+  .stat-icon{width:36px;height:36px;background:var(--primary-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary);flex-shrink:0}
+  .stat-value{font-size:1.15rem;font-weight:700}
+  .stat-label{font-size:.7rem;color:var(--muted)}
+
+  /* Section Title */
+  .section-title{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+
+  /* Cards Grid */
+  .cards{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));margin-bottom:48px}
+  .card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);transition:box-shadow .3s;display:flex;flex-direction:column}
+  .card:hover{box-shadow:var(--shadow-hover)}
+  .card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .card-icon{width:40px;height:40px;background:var(--primary-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary);flex-shrink:0}
+  .card-header h3{font-size:1.05rem;font-weight:600}
+  .card-header p{font-size:.8rem;color:var(--muted)}
+  .card-info{display:none;background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;font-size:.78rem;color:var(--muted);line-height:1.7}
+  .card-info.open{display:block}
+  .card-info strong{color:var(--text)}
+  .card-info .formula{font-family:'Courier New',monospace;text-align:center;padding:6px 0;font-size:.85rem;color:var(--primary)}
+  .info-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px;border-radius:6px;transition:color .2s}
+  .info-btn:hover{color:var(--primary)}
+
+  /* Form */
+  label{display:block;font-size:.75rem;font-weight:500;color:var(--muted);margin-bottom:4px}
+  input[type="number"]{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.9rem;background:var(--bg);color:var(--text);outline:none;transition:border .2s}
+  input[type="number"]:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  .input-row{display:grid;gap:8px;margin-bottom:12px}
+  .input-row.cols-2{grid-template-columns:1fr 1fr}
+  .input-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+  .btn{width:100%;padding:10px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+  .btn:hover{background:#1d4ed8}
+
+  /* Results */
+  .result{background:#f8fafc;border-radius:10px;padding:16px;margin-top:12px;display:none}
+  .result.show{display:block;animation:fadeIn .3s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .result-msg{font-size:.9rem;font-weight:600;margin-bottom:8px}
+  .result-msg.error{color:var(--danger)}
+  .result-msg.ok{color:var(--text)}
+  .steps{margin-bottom:10px}
+  .steps p{font-size:.75rem;font-family:'Courier New',monospace;color:var(--muted);line-height:1.8}
+  .result-boxes{display:flex;gap:10px}
+  .result-box{flex:1;background:var(--card);border-radius:8px;padding:10px;text-align:center}
+  .result-box small{font-size:.7rem;color:var(--muted)}
+  .result-box .val{font-size:1.3rem;font-weight:700}
+
+  /* Breakdown */
+  .breakdown{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .breakdown-item{flex:1;min-width:80px;background:var(--card);border-radius:8px;padding:10px;text-align:center}
+  .breakdown-item small{font-size:.65rem;color:var(--muted);display:block}
+  .breakdown-item .val{font-size:1rem;font-weight:700}
+
+  /* Progress bar */
+  .progress-wrap{margin-top:10px}
+  .progress-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:4px}
+  .progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;border-radius:4px;transition:width .5s,background .3s}
+
+  /* Badge */
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:8px;font-size:.8rem;font-weight:600;margin-top:8px}
+  .badge.success{background:var(--success-bg);color:var(--success)}
+  .badge.warning{background:var(--warning-bg);color:var(--warning)}
+  .badge.danger{background:var(--danger-bg);color:var(--danger)}
+
+  /* Info Section */
+  .info-section{background:var(--card);border-top:1px solid var(--border);padding:48px 0}
+  .info-section h3{font-size:1.2rem;font-weight:700;margin-bottom:20px}
+  .info-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .info-card{border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .info-card .tag{display:inline-block;font-family:'Courier New',monospace;font-size:.78rem;color:var(--primary);background:var(--primary-light);padding:3px 10px;border-radius:6px;margin-bottom:8px}
+  .info-card h4{font-size:.95rem;font-weight:600;margin-bottom:6px}
+  .info-card p{font-size:.82rem;color:var(--muted);line-height:1.6}
+
+  /* Footer */
+  footer{border-top:1px solid var(--border);padding:20px 0;text-align:center}
+  footer p{font-size:.8rem;color:var(--muted)}
+  footer small{font-size:.7rem;color:var(--muted)}
+
+  @media(max-width:700px){
+    .status{display:none}
+    .cards{grid-template-columns:1fr}
+    .input-row.cols-3{grid-template-columns:1fr}
+    .info-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="container header-inner">
+    <div class="logo">
+      <div class="logo-icon">🚛</div>
+      <div>
+        <h1>Transportadora Express</h1>
+        <small>Math & Logistix</small>
+      </div>
+    </div>
+    <div class="status"><span class="status-dot"></span> Sistema operacional</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">📐 Ferramentas matemáticas aplicadas à logística</div>
+  <h2>Gestão Logística<br><span>Inteligente</span></h2>
+  <p>Transforme fórmulas matemáticas em decisões logísticas. Calcule fretes com funções lineares, resolva equações quadráticas com Bhaskara e valide orçamentos com inequações — tudo em tempo real.</p>
+</section>
+
+<!-- Stats -->
+<section class="container">
+  <div class="stats">
+    <div class="stat"><div class="stat-icon">📦</div><div><div class="stat-value">12.400+</div><div class="stat-label">Entregas/mês</div></div></div>
+    <div class="stat"><div class="stat-icon">📍</div><div><div class="stat-value">350+</div><div class="stat-label">Cidades atendidas</div></div></div>
+    <div class="stat"><div class="stat-icon">📊</div><div><div class="stat-value">99.8%</div><div class="stat-label">Precisão de cálculo</div></div></div>
+    <div class="stat"><div class="stat-icon">⚡</div><div><div class="stat-value">&lt;1s</div><div class="stat-label">Tempo de resposta</div></div></div>
+  </div>
+</section>
+
+<!-- Cards -->
+<section class="container">
+  <p class="section-title">Módulos de cálculo</p>
+  <div class="cards">
+
+    <!-- Calculadora de Frete -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🚚</div>
+        <div><h3>Calculadora de Frete</h3><p>Função linear: f(x) = ax + b</p></div>
+        <button class="info-btn" onclick="toggleInfo('freight-info')">ℹ️</button>
+      </div>
+      <div class="card-info" id="freight-info">
+        <strong>Modelo de função linear:</strong>
+        <div class="formula">f(x) = ax + b</div>
+        <p>Onde <strong>a</strong> = custo por km, <strong>x</strong> = distância e <strong>b</strong> = taxa fixa de despacho. O custo cresce proporcionalmente à distância.</p>
+      </div>
+      <div class="input-row cols-2">
+        <div><label>Custo por km (R$)</label><input type="number" id="f-rate" placeholder="4.50" step="0.01"></div>
+        <div><label>Distância (km)</label><input type="number" id="f-dist" placeholder="120"></div>
+      </div>
+      <div class="input-row">
+        <div><label>Taxa fixa de despacho (R$)</label><input type="number" id="f-fee" placeholder="45.00" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcFreight()">Calcular Frete →</button>
+      <div class="result" id="freight-result"></div>
+    </div>
+
+    <!-- Solucionador Algébrico -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🧮</div>
+        <div><h3>Solucionador Algébrico</h3><p>Bhaskara: ax² + bx + c = 0</p></div>
+        <button class="info-btn" onclick="toggleInfo('bhask-info')">ℹ️</button>
+      </div>
+      <div class="card-info" id="bhask-info">
+        <strong>Fórmula de Bhaskara:</strong>
+        <div class="formula">x = (−b ± √(b²−4ac)) / 2a</div>
+        <p>• <strong>Δ &gt; 0</strong>: Duas raízes reais distintas<br>
+           • <strong>Δ = 0</strong>: Uma raiz real (dupla)<br>
+           • <strong>Δ &lt; 0</strong>: Sem raízes reais</p>
+        <p><em>Aplicação: encontrar pontos de equilíbrio em modelos quadráticos de logística.</em></p>
+      </div>
+      <div class="input-row cols-3">
+        <div><label>a (coef. x²)</label><input type="number" id="b-a" placeholder="1"></div>
+        <div><label>b (coef. x)</label><input type="number" id="b-b" placeholder="-5"></div>
+        <div><label>c (constante)</label><input type="number" id="b-c" placeholder="6"></div>
+      </div>
+      <button class="btn" onclick="solveBhaskara()">Resolver Equação →</button>
+      <div class="result" id="bhask-result"></div>
+    </div>
+
+    <!-- Validador de Orçamento -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">✅</div>
+        <div><h3>Validador de Orçamento</h3><p>Inequação: Frete ≤ Limite</p></div>
+        <button class="info-btn" onclick="toggleInfo('budget-info')">ℹ️</button>
+      </div>
+      <div class="card-info" id="budget-info">
+        <strong>Lógica de inequação:</strong>
+        <div class="formula">Frete(x) ≤ Orçamento Máximo</div>
+        <p>Compara o custo total do frete com o limite orçamentário definido. Indica automaticamente se a operação está <strong>dentro</strong> ou <strong>fora</strong> do orçamento.</p>
+      </div>
+      <div class="input-row cols-2">
+        <div><label>Valor do frete (R$)</label><input type="number" id="v-freight" placeholder="585.00" step="0.01"></div>
+        <div><label>Orçamento máximo (R$)</label><input type="number" id="v-budget" placeholder="600.00" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="validateBudget()">Validar Orçamento →</button>
+      <div class="result" id="budget-result"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Info Section -->
+<section class="info-section">
+  <div class="container">
+    <h3>Como funciona a matemática por trás</h3>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="tag">f(x) = ax + b</span>
+        <h4>Função Linear</h4>
+        <p>Modela custos proporcionais à distância. O coeficiente angular 'a' representa o custo por km e 'b' a taxa fixa de despacho. Quanto maior a distância, maior o custo — crescimento constante.</p>
+      </div>
+      <div class="info-card">
+        <span class="tag">ax² + bx + c = 0</span>
+        <h4>Equação Quadrática</h4>
+        <p>Utilizada para encontrar pontos de equilíbrio em modelos de custo não-lineares. O discriminante (Δ) determina se existem soluções reais, essencial para análise de viabilidade.</p>
+      </div>
+      <div class="info-card">
+        <span class="tag">Frete(x) ≤ Orçamento</span>
+        <h4>Inequação</h4>
+        <p>Filtro lógico que compara o custo calculado com o limite orçamentário. Aprovação automática quando o frete está dentro da margem — controle financeiro em tempo real.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <p>© 2026 Transportadora Express — Math & Logistix</p>
+    <small>Cálculos realizados com JavaScript puro · Sem dependências externas</small>
+  </div>
+</footer>
+
+<script>
+  // ========== Utilitários ==========
+  function toggleInfo(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+
+  function fmt(n) {
+    return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // ========== 1. Calculadora de Frete — f(x) = ax + b ==========
+  function calcFreight() {
+    const rate = parseFloat(document.getElementById('f-rate').value);
+    const dist = parseFloat(document.getElementById('f-dist').value);
+    const fee  = parseFloat(document.getElementById('f-fee').value);
+    const el   = document.getElementById('freight-result');
+
+    if (isNaN(rate) || isNaN(dist) || isNaN(fee)) {
+      el.innerHTML = '<p class="result-msg error">Preencha todos os campos com valores válidos.</p>';
+      el.classList.add('show');
+      return;
+    }
+
+    const varCost = rate * dist;
+    const total   = varCost + fee;
+
+    el.innerHTML = `
+      <p class="result-msg ok">Custo total do frete</p>
+      <div class="steps">
+        <p>1. f(x) = a·x + b</p>
+        <p>2. f(${dist}) = ${fmt(rate)} × ${dist} + ${fmt(fee)}</p>
+        <p>3. f(${dist}) = ${fmt(varCost)} + ${fmt(fee)}</p>
+        <p>4. f(${dist}) = R$ ${fmt(total)}</p>
+      </div>
+      <div class="result-boxes">
+        <div class="result-box"><small>Total</small><div class="val" style="color:var(--primary)">R$ ${fmt(total)}</div></div>
+      </div>
+      <div class="breakdown">
+        <div class="breakdown-item"><small>Taxa/km</small><div class="val">R$ ${fmt(rate)}</div></div>
+        <div class="breakdown-item"><small>Distância</small><div class="val">${dist} km</div></div>
+        <div class="breakdown-item"><small>Taxa fixa</small><div class="val">R$ ${fmt(fee)}</div></div>
+      </div>
+    `;
+    el.classList.add('show');
+  }
+
+  // ========== 2. Solucionador Algébrico — Bhaskara ==========
+  function solveBhaskara() {
+    const a = parseFloat(document.getElementById('b-a').value);
+    const b = parseFloat(document.getElementById('b-b').value);
+    const c = parseFloat(document.getElementById('b-c').value);
+    const el = document.getElementById('bhask-result');
+
+    if (isNaN(a) || isNaN(b) || isNaN(c)) {
+      el.innerHTML = '<p class="result-msg error">Preencha todos os campos.</p>';
+      el.classList.add('show');
+      return;
+    }
+    if (a === 0) {
+      el.innerHTML = '<p class="result-msg error">\'a\' não pode ser zero (não seria equação do 2º grau).</p>';
+      el.classList.add('show');
+      return;
+    }
+
+    const delta = b * b - 4 * a * c;
+    let steps = `
+      <p>1. Equação: ${a}x² + (${b})x + (${c}) = 0</p>
+      <p>2. Δ = b² − 4ac = (${b})² − 4·(${a})·(${c})</p>
+      <p>3. Δ = ${b*b} − ${4*a*c} = ${delta}</p>
+    `;
+
+    let boxes = '';
+    let msg = '';
+
+    if (delta < 0) {
+      steps += `<p>4. Δ &lt; 0 → Não existem raízes reais</p>`;
+      msg = 'Sem raízes reais (Δ < 0)';
+    } else {
+      const sqrtD = Math.sqrt(delta);
+      const x1 = (-b + sqrtD) / (2 * a);
+      const x2 = (-b - sqrtD) / (2 * a);
+      steps += `<p>4. √Δ = √${delta} = ${sqrtD.toFixed(4)}</p>`;
+      steps += `<p>5. x₁ = (−b + √Δ) / 2a = (${-b} + ${sqrtD.toFixed(4)}) / ${2*a} = ${x1.toFixed(4)}</p>`;
+      steps += `<p>6. x₂ = (−b − √Δ) / 2a = (${-b} − ${sqrtD.toFixed(4)}) / ${2*a} = ${x2.toFixed(4)}</p>`;
+      msg = delta === 0 ? 'Raiz dupla (Δ = 0)' : 'Duas raízes reais distintas';
+      boxes = `
+        <div class="result-boxes">
+          <div class="result-box"><small>x₁</small><div class="val">${x1.toFixed(4)}</div></div>
+          <div class="result-box"><small>x₂</small><div class="val">${x2.toFixed(4)}</div></div>
+        </div>
+      `;
+    }
+
+    el.innerHTML = `
+      <p class="result-msg ok">${msg}</p>
+      <div class="steps">${steps}</div>
+      ${boxes}
+      <div class="result-boxes" style="margin-top:8px">
+        <div class="result-box"><small>Discriminante (Δ)</small><div class="val">${delta.toFixed(2)}</div></div>
+      </div>
+    `;
+    el.classList.add('show');
+  }
+
+  // ========== 3. Validador de Orçamento — Inequação ==========
+  function validateBudget() {
+    const freight = parseFloat(document.getElementById('v-freight').value);
+    const budget  = parseFloat(document.getElementById('v-budget').value);
+    const el      = document.getElementById('budget-result');
+
+    if (isNaN(freight) || isNaN(budget)) {
+      el.innerHTML = '<p class="result-msg error">Preencha ambos os campos.</p>';
+      el.classList.add('show');
+      return;
+    }
+    if (budget <= 0) {
+      el.innerHTML = '<p class="result-msg error">Orçamento deve ser maior que zero.</p>';
+      el.classList.add('show');
+      return;
+    }
+
+    const pct = (freight / budget) * 100;
+    const diff = budget - freight;
+    const within = freight <= budget;
+
+    let barColor = 'var(--success)';
+    let badgeClass = 'success';
+    let badgeText = '✓ Dentro do limite';
+    if (!within) { barColor = 'var(--danger)'; badgeClass = 'danger'; badgeText = '✗ Acima do limite'; }
+    else if (pct > 85) { barColor = 'var(--warning)'; badgeClass = 'warning'; badgeText = '⚠ Margem apertada'; }
+
+    el.innerHTML = `
+      <p class="result-msg ok">Análise orçamentária</p>
+      <div class="steps">
+        <p>1. Frete: R$ ${fmt(freight)} | Orçamento: R$ ${fmt(budget)}</p>
+        <p>2. ${fmt(freight)} ${within ? '≤' : '>'} ${fmt(budget)} → ${within ? 'APROVADO' : 'REPROVADO'}</p>
+        <p>3. Uso: ${pct.toFixed(1)}% do orçamento</p>
+        <p>4. ${within ? 'Margem restante' : 'Excedente'}: R$ ${fmt(Math.abs(diff))}</p>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Uso do orçamento</span><span>${Math.min(pct, 100).toFixed(1)}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pct, 100)}%;background:${barColor}"></div></div>
+      </div>
+      <div style="text-align:center;margin-top:10px">
+        <span class="badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="breakdown">
+        <div class="breakdown-item"><small>Frete</small><div class="val">R$ ${fmt(freight)}</div></div>
+        <div class="breakdown-item"><small>Limite</small><div class="val">R$ ${fmt(budget)}</div></div>
+        <div class="breakdown-item"><small>${within ? 'Sobra' : 'Excesso'}</small><div class="val" style="color:${within ? 'var(--success)' : 'var(--danger)'}">R$ ${fmt(Math.abs(diff))}</div></div>
+      </div>
+    `;
+    el.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
