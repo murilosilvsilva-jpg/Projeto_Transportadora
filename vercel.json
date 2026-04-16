@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "public",
+  "routes": [
+    { "src": "/", "dest": "/transportadora-express.html" }
+  ]
+}
